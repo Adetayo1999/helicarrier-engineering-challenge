@@ -16,6 +16,7 @@ for (let i = 0; i < dates.length; i++) {
     const transaction = {
       id: uuidv4(),
       date: dates[i],
+
       status: j % 2 ? "pending" : "active",
       type: j % 2 ? "credit" : "debit",
     };
