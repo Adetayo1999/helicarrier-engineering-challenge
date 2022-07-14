@@ -16,11 +16,22 @@ function App() {
   const [typeFilter, setTypeFilter] = useState("");
   const [results, setResults] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
+  const [searchText, setSearchText] = useState("");
   const { data, loading } = useQuery(TRANSACTION);
 
   useEffect(() => {
-    if (!loading) {
-      const groups = data.transactions
+    if (!loading && data?.transactions) {
+      const groups = data?.transactions
+        .filter((item: any) => {
+          return Object.keys(item).some((key) => {
+            return key === "id"
+              ? false
+              : item[key]
+                  .toString()
+                  .toLowerCase()
+                  .includes(searchText.toLowerCase().trim());
+          });
+        })
         .filter((item: any) => {
           if (statusFilter && typeFilter)
             return item.type === typeFilter && item.status === statusFilter;
@@ -46,9 +57,19 @@ function App() {
       });
       setResults(groupArrays);
     }
-  }, [statusFilter, typeFilter, loading]);
+  }, [statusFilter, typeFilter, loading, searchText]);
 
   if (loading) return <p>Loading...</p>;
+
+  if (!data) {
+    return (
+      <div className='flex justify-center items-center'>
+        <p className='text-red-500 text-lg'>
+          Something went wrong, ensure you have a connection
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen  p-5'>
@@ -61,6 +82,8 @@ function App() {
             id=''
             placeholder='Enter Something here...'
             className='w-full h-full px-4 py-2 outline-none transition duration-150 focus:ring-4 focus:ring-green-300 rounded-md focus:ring-opacity-30 border border-gray-200'
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
           />
         </div>
         {/* Filters */}
