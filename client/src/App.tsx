@@ -17,10 +17,10 @@ function App() {
   const [results, setResults] = useState([]);
   const [statusFilter, setStatusFilter] = useState("");
   const [searchText, setSearchText] = useState("");
-  const { data, loading } = useQuery(TRANSACTION);
+  const { data, loading, error } = useQuery(TRANSACTION);
 
   useEffect(() => {
-    if (!loading && data?.transactions) {
+    if (!loading && data && data?.transactions) {
       const groups = data?.transactions
         .filter((item: any) => {
           return Object.keys(item).some((key) => {
@@ -59,9 +59,9 @@ function App() {
     }
   }, [statusFilter, typeFilter, loading, searchText]);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className='text-center'>Loading...</p>;
 
-  if (!data) {
+  if (error) {
     return (
       <div className='flex justify-center items-center'>
         <p className='text-red-500 text-lg'>
